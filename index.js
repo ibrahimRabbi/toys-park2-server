@@ -32,7 +32,7 @@ const userCollaction = client.db('toys-park-2').collection('user')
 const paymentCollaction = client.db('toys-park-2').collection('payment')
 async function run() {
     try {
-       // await client.connect();
+        // await client.connect();
 
 
         app.get('/data/:category', async (req, res) => {
@@ -69,11 +69,22 @@ async function run() {
 
         app.get('/data', async (req, res) => {
             let query = {}
-
-
+            let sort = {}
             if (req.query.email) {
                 query = { email: req.query.email }
             }
+
+            if (req.query.sort === 'Low price') {
+                sort = { price: 1 }
+            }
+            if (req.query.sort === 'High price') {
+                sort = { price: -1 }
+            }
+
+            if (req.query.sort === 'Rating') {
+                query = { rating: 5 }
+            }
+
             if (req.query.rating) {
                 query = { rating: parseFloat(req.query.rating) }
 
@@ -83,10 +94,13 @@ async function run() {
                 query = { name: { $regex: req.query.search, $options: 'i' } }
             }
 
-            const data = dataCollaction.find(query)
+            const data = dataCollaction.find(query).sort(sort)
             const final = await data.toArray()
             res.send(final)
         })
+
+
+
 
         app.post('/data', async (req, res) => {
             const obj = req.body
@@ -107,6 +121,7 @@ async function run() {
         })
 
         app.post('/cart', async (req, res) => {
+            console.log(req.body)
             const inserted = await cartCollaction.insertOne(req.body)
             res.send(inserted)
         })
