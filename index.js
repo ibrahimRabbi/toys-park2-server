@@ -32,7 +32,7 @@ const userCollaction = client.db('toys-park-2').collection('user')
 const paymentCollaction = client.db('toys-park-2').collection('payment')
 async function run() {
     try {
-        // await client.connect();
+        await client.connect();
 
 
         app.get('/data/:category', async (req, res) => {
@@ -43,12 +43,11 @@ async function run() {
             if (req.params.category) {
                 query = { category: req.params.category }
             }
-            if (req.params.category === 'marvel') {
-                query = { category: "marvel" }
-            }
             if (req.params.category === 'avangers' || req.params.category === 'spiderman') {
                 query = { subCategory: req.params.category }
             }
+
+//sorting
             if (req.query.sort === 'Low price') {
                 sort = { price: 1 }
             }
@@ -121,7 +120,6 @@ async function run() {
         })
 
         app.post('/cart', async (req, res) => {
-            console.log(req.body)
             const inserted = await cartCollaction.insertOne(req.body)
             res.send(inserted)
         })
